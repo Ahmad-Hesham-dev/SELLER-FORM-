@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+    <title>BEKYA · seller dashboard</title>
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz@14..32&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        }
+
+        /* CSS Variables – light mode (default) */
+        body {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8fafc;
+            --surface: #ffffff;
+            --text-primary: #1e293b;
+            --text-secondary: #475569;
+            --border-light: #e2e8f0;
+            --card-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.02);
+            --hover-glow: 0 0 0 2px rgba(10, 61, 42, 0.2), 0 0 20px rgba(10, 61, 42, 0.15);
+            --accent-green: #0A3D2A;
+            --accent-soft: #eef7f2;
+            --progress-bg: #e2e8f0;
+            transition: background-color 0.3s ease, color 0.2s ease;
+        }
+
+        /* dark mode class */
+        body.dark {
+            --bg-primary: #0f1a1c;
+            --bg-secondary: #1a2a2c;
+            --surface: #1f2e30;
+            --text-primary: #edf2f7;
+            --text-secondary: #cbd5e1;
+            --border-light: #2d3f42;
+            --card-shadow: 0 15px 30px -10px rgba(0, 0, 0, 0.5);
+            --accent-soft: #1e3a2f;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.5;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* layout */
+        .app-wrapper {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 1.5rem 1.5rem 1rem;
+            width: 100%;
+        }
+
+        /* ----- HEADER ----- */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            color: var(--accent-green);
+            background: linear-gradient(145deg, #0A3D2A, #1b6b4a);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-controls {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .toggle-btn {
+            background: var(--surface);
+            border: 1px solid var(--border-light);
+            border-radius: 40px;
+            padding: 0.6rem 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.25s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+        }
+
+        .toggle-btn i {
+            font-size: 1.2rem;
+            color: var(--accent-green);
+        }
+
+        .toggle-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--hover-glow);
+            border-color: var(--accent-green);
+        }
+
+        /* ----- DASHBOARD LAYOUT (flex, dir attribute controls sidebar side) ----- */
+        .dashboard-container {
+            display: flex;
+            gap: 2rem;
+            align-items: flex-start;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            flex: 0 0 240px;
+            background: var(--surface);
+            border-radius: 28px;
+            padding: 1.5rem 0.5rem;
+            box-shadow: var(--card-shadow);
+            border: 1px solid var(--border-light);
+            backdrop-filter: blur(2px);
+            transition: all 0.2s;
+        }
+
+        .sidebar-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 0.9rem 1.2rem;
+            border-radius: 18px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            border: none;
+            background: transparent;
+            width: 100%;
+            text-align: left;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .menu-item i {
+            font-size: 1.2rem;
+            width: 1.8rem;
+            color: var(--accent-green);
+        }
+
+        .menu-item:hover {
+            background: var(--accent-soft);
+            color: var(--accent-green);
+            transform: scale(1.02);
+        }
+
+        .menu-item.active {
+            background: var(--accent-green);
+            color: white;
+            box-shadow: 0 8px 18px rgba(10, 61, 42, 0.3);
+        }
+
+        .menu-item.active i {
+            color: white;
+        }
+
+        /* MAIN CONTENT */
+        .main-content {
+            flex: 1;
+            background: var(--surface);
+            border-radius: 32px;
+            padding: 2rem 2rem;
+            box-shadow: var(--card-shadow);
+            border: 1px solid var(--border-light);
+            min-height: 70vh;
+        }
+
+        /* sections */
+        .section {
+            display: none;
+            animation: fadeSlide 0.3s ease;
+        }
+
+        .section.active-section {
+            display: block;
+        }
+
+        @keyframes fadeSlide {
+            0% { opacity: 0.4; transform: translateY(6px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, var(--accent-green), #2f8e6b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--bg-secondary);
+            border-radius: 24px;
+            padding: 1.5rem;
+            border: 1px solid var(--border-light);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+        }
+
+        .stat-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--accent-green);
+            margin: 0.4rem 0 0.2rem;
+        }
+
+        .progress {
+            background: var(--progress-bg);
+            height: 10px;
+            border-radius: 20px;
+            overflow: hidden;
+            margin: 0.8rem 0;
+        }
+
+        .progress-bar {
+            background: var(--accent-green);
+            height: 10px;
+            border-radius: 20px;
+            width: 0%;
+        }
+
+        .badge {
+            background: var(--accent-soft);
+            color: var(--accent-green);
+            padding: 0.25rem 0.8rem;
+            border-radius: 40px;
+            font-weight: 500;
+            font-size: 0.85rem;
+        }
+
+        button.primary {
+            background: var(--accent-green);
+            border: none;
+            color: white;
+            padding: 0.8rem 2rem;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 6px 14px rgba(10,61,42,0.25);
+        }
+
+        button.primary:hover {
+            background: #0e5538;
+            transform: scale(1.02);
+            box-shadow: 0 10px 20px rgba(10,61,42,0.4);
+        }
+
+        input, select {
+            width: 100%;
+            padding: 1rem 1.2rem;
+            border-radius: 30px;
+            border: 1.5px solid var(--border-light);
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: 0.2s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--accent-green);
+            box-shadow: 0 0 0 3px rgba(10,61,42,0.2);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .materials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .material-card {
+            background: var(--bg-secondary);
+            border-radius: 24px;
+            padding: 1rem;
+            border: 1px solid var(--border-light);
+            transition: all 0.2s;
+        }
+
+        .material-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--hover-glow);
+        }
+
+        .material-card img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 18px;
+            background: #d9d9d9;
+        }
+
+        .flex-between {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .rtl .sidebar {
+            /* no extra needed because dir=rtl swaps order automatically */
+        }
+
+        /* responsive */
+        @media (max-width: 900px) {
+            .dashboard-container {
+                flex-direction: column;
+            }
+            .sidebar {
+                flex: auto;
+                width: 100%;
+            }
+            .sidebar-menu {
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            .menu-item {
+                width: auto;
+                flex: 0 1 auto;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .app-wrapper { padding: 1rem; }
+            .header { flex-direction: column; align-items: start; }
+            .menu-item span { display: none; } /* icons only */
+            .menu-item i { margin: 0 auto; }
+            .menu-item { justify-content: center; padding: 0.9rem; }
+        }
+
+        /* environmental impact text */
+        .impact-message {
+            background: var(--accent-soft);
+            border-radius: 50px;
+            padding: 1rem 2rem;
+            font-size: 1.2rem;
+            border-left: 6px solid var(--accent-green);
+        }
+
+        canvas { max-height: 250px; margin-top: 1rem; }
+    </style>
+</head>
+<body dir="ltr">
+    <div class="app-wrapper">
+        <!-- HEADER -->
+        <header class="header">
+            <div class="logo">BEKYA</div>
+            <div class="header-controls">
+                <!-- Dark mode toggle -->
+                <button class="toggle-btn" id="themeToggle" aria-label="Toggle theme">
+                    <i id="themeIcon" class="fas fa-sun"></i>
+                    <span>Light / Dark</span>
+                </button>
+                <!-- Language toggle -->
+                <button class="toggle-btn" id="langToggle" aria-label="Toggle language">
+                    <i class="fas fa-language"></i>
+                    <span id="langLabel">English</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- DASHBOARD -->
+        <div class="dashboard-container">
+            <!-- SIDEBAR (6 sections) -->
+            <aside class="sidebar">
+                <nav class="sidebar-menu">
+                    <button class="menu-item active" data-section="overview"><i class="fas fa-home"></i> <span>Overview</span></button>
+                    <button class="menu-item" data-section="addMaterial"><i class="fas fa-plus-circle"></i> <span>Add Material</span></button>
+                    <button class="menu-item" data-section="myMaterials"><i class="fas fa-recycle"></i> <span>My Materials</span></button>
+                    <button class="menu-item" data-section="statistics"><i class="fas fa-chart-line"></i> <span>Statistics</span></button>
+                    <button class="menu-item" data-section="rewards"><i class="fas fa-gift"></i> <span>Rewards / Points</span></button>
+                    <button class="menu-item" data-section="profile"><i class="fas fa-user-circle"></i> <span>Profile</span></button>
+                </nav>
+            </aside>
+
+            <!-- MAIN CONTENT (sections) -->
+            <main class="main-content">
+                <!-- OVERVIEW SECTION -->
+                <section id="overview" class="section active-section">
+                    <h2>🌍 Overview</h2>
+                    <div class="card-grid">
+                        <div class="stat-card"><i class="fas fa-boxes"></i> Total materials <span class="stat-value" id="overviewTotalMaterials">0</span></div>
+                        <div class="stat-card"><i class="fas fa-coins"></i> Total points <span class="stat-value" id="overviewTotalPoints">0</span></div>
+                    </div>
+                    <div class="impact-message" id="impactText">You helped recycle <strong>0g</strong> of materials. Keep saving the planet! 🌱</div>
+                    <h3 style="margin-top:2rem;">Recent uploads</h3>
+                    <div id="recentUploads" class="materials-grid" style="grid-template-columns:repeat(auto-fill, minmax(200px,1fr));"></div>
+                </section>
+
+                <!-- ADD MATERIAL SECTION -->
+                <section id="addMaterial" class="section">
+                    <h2>➕ Register material</h2>
+                    <div class="form-group">
+                        <label>Material type</label>
+                        <select id="materialName">
+                            <option value="Aluminum">Aluminum</option>
+                            <option value="Plastic">Plastic</option>
+                            <option value="Paper">Paper</option>
+                            <option value="Glass">Glass</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Weight (grams)</label>
+                        <input type="number" id="materialWeight" placeholder="e.g. 500" min="1">
+                    </div>
+                    <div class="form-group">
+                        <label>Upload image</label>
+                        <input type="file" id="materialImage" accept="image/*">
+                    </div>
+                    <button class="primary" id="addMaterialBtn"><i class="fas fa-save"></i> Add material</button>
+                </section>
+
+                <!-- MY MATERIALS SECTION -->
+                <section id="myMaterials" class="section">
+                    <h2>📦 My materials</h2>
+                    <div id="materialsList" class="materials-grid"></div>
+                </section>
+
+                <!-- STATISTICS SECTION -->
+                <section id="statistics" class="section">
+                    <h2> Statistics</h2>
+                    <div class="card-grid">
+                        <div class="stat-card"><span>Total grams</span><span class="stat-value" id="statTotalGrams">0</span></div>
+                        <div class="stat-card"><span>Total points</span><span class="stat-value" id="statTotalPoints">0</span></div>
+                        <div class="stat-card"><span>Uploads</span><span class="stat-value" id="statUploads">0</span></div>
+                    </div>
+                    <div class="stat-card">
+                        <span> Hourly increase (last 24h vs previous)</span>
+                        <div class="stat-value" id="hourlyIncrease">+0%</div>
+                        <div class="progress"><div class="progress-bar" id="increaseBar" style="width:0%"></div></div>
+                    </div>
+                    <canvas id="statsChart"></canvas>
+                </section>
+
+                <!-- REWARDS SECTION -->
+                <section id="rewards" class="section">
+                    <h2>🏆 Rewards</h2>
+                    <div class="stat-card">
+                        <i class="fas fa-star"></i> Total points: <span id="rewardPoints">0</span>
+                    </div>
+                    <div class="stat-card">
+                        <span>Next milestone: 1000 pts</span>
+                        <div class="progress"><div class="progress-bar" id="milestoneBar" style="width:0%"></div></div>
+                        <p id="milestoneText">0/1000</p>
+                    </div>
+                    <div class="badge">♻️ 500 pts = Bronze, 1000 pts = Silver, 5000 = Gold</div>
+                </section>
+
+                <!-- PROFILE SECTION -->
+                <section id="profile" class="section">
+                    <h2>👤 Seller profile</h2>
+                    <div class="stat-card">
+                        <p><i class="fas fa-user"></i> <strong>Name:</strong> <span id="profileName"></span></p>
+                        <p><i class="fas fa-phone"></i> <strong>Phone:</strong> <span id="profilePhone"></span></p>
+                        <p><i class="fas fa-badge"></i> <strong>Role:</strong> Seller</p>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            // ----- INITIAL STORAGE DEFAULTS -----
+            if (!localStorage.getItem('userName')) localStorage.setItem('userName', 'Amina Al-Rashid');
+            if (!localStorage.getItem('userPhone')) localStorage.setItem('userPhone', '+966 50 123 4567');
+            if (!localStorage.getItem('materials')) localStorage.setItem('materials', JSON.stringify([]));
+
+            // ----- GLOBAL VARIABLES -----
+            let materials = JSON.parse(localStorage.getItem('materials')) || [];
+            let chartInstance = null;
+
+            // ----- HELPER: SAVE & RENDER -----
+            function saveMaterials() {
+                localStorage.setItem('materials', JSON.stringify(materials));
+                renderAllSections();
+            }
+
+            // ----- RENDER ALL SECTIONS -----
+            function renderAllSections() {
+                renderMyMaterials();
+                renderStatistics();
+                renderOverview();
+                renderRewards();
+                renderProfile();
+            }
+
+            // profile
+            function renderProfile() {
+                document.getElementById('profileName').innerText = localStorage.getItem('userName') || '—';
+                document.getElementById('profilePhone').innerText = localStorage.getItem('userPhone') || '—';
+            }
+
+            // rewards
+            function renderRewards() {
+                const totalPoints = materials.reduce((acc, m) => acc + (m.points || 0), 0);
+                document.getElementById('rewardPoints').innerText = totalPoints;
+                const percent = Math.min(100, (totalPoints / 1000) * 100);
+                document.getElementById('milestoneBar').style.width = percent + '%';
+                document.getElementById('milestoneText').innerText = totalPoints + '/1000';
+            }
+
+            // overview
+            function renderOverview() {
+                const totalMaterials = materials.length;
+                const totalPoints = materials.reduce((acc, m) => acc + (m.points || 0), 0);
+                const totalGrams = materials.reduce((acc, m) => acc + (m.weight || 0), 0);
+                document.getElementById('overviewTotalMaterials').innerText = totalMaterials;
+                document.getElementById('overviewTotalPoints').innerText = totalPoints;
+                document.getElementById('impactText').innerHTML = `You helped recycle <strong>${totalGrams}g</strong> of materials. Keep saving the planet! 🌱`;
+
+                // recent uploads (last 3)
+                const recent = [...materials].reverse().slice(0, 3);
+                const container = document.getElementById('recentUploads');
+                container.innerHTML = '';
+                recent.forEach(m => {
+                    const card = document.createElement('div');
+                    card.className = 'material-card';
+                    card.innerHTML = `
+                        <img src="${m.imageBase64 || 'https://via.placeholder.com/150?text=recycle'}" alt="material">
+                        <p><strong>${m.name}</strong> ${m.weight}g</p>
+                        <small>${new Date(m.date).toLocaleDateString()}</small>
+                    `;
+                    container.appendChild(card);
+                });
+            }
+
+            // my materials
+            function renderMyMaterials() {
+                const container = document.getElementById('materialsList');
+                container.innerHTML = '';
+                if (materials.length === 0) {
+                    container.innerHTML = '<p class="stat-card">No materials added yet.</p>';
+                    return;
+                }
+                materials.slice().reverse().forEach(m => {
+                    const card = document.createElement('div');
+                    card.className = 'material-card';
+                    card.innerHTML = `
+                        <img src="${m.imageBase64 || 'https://via.placeholder.com/150?text=BEKYA'}" alt="img">
+                        <div class="flex-between"><span>${m.name}</span><span class="badge">${m.weight}g</span></div>
+                        <div class="flex-between"><span>⭐ ${m.points} pts</span><small>${new Date(m.date).toLocaleDateString()}</small></div>
+                    `;
+                    container.appendChild(card);
+                });
+            }
+
+            // statistics
+            function renderStatistics() {
+                const totalGrams = materials.reduce((acc, m) => acc + (m.weight || 0), 0);
+                const totalPoints = materials.reduce((acc, m) => acc + (m.points || 0), 0);
+                const uploads = materials.length;
+                document.getElementById('statTotalGrams').innerText = totalGrams;
+                document.getElementById('statTotalPoints').innerText = totalPoints;
+                document.getElementById('statUploads').innerText = uploads;
+
+                // hourly increase (last 24h vs previous 24h)
+                const now = Date.now();
+                const oneDay = 24 * 60 * 60 * 1000;
+                const last24 = materials.filter(m => (now - new Date(m.date).getTime()) <= oneDay).reduce((acc, m) => acc + m.weight, 0);
+                const prev24 = materials.filter(m => {
+                    const diff = now - new Date(m.date).getTime();
+                    return diff > oneDay && diff <= 2 * oneDay;
+                }).reduce((acc, m) => acc + m.weight, 0);
+
+                let increase = 0;
+                if (prev24 > 0) increase = ((last24 - prev24) / prev24) * 100;
+                else if (last24 > 0) increase = 100;
+                document.getElementById('hourlyIncrease').innerText = (increase > 0 ? '+' : '') + increase.toFixed(1) + '%';
+                document.getElementById('increaseBar').style.width = Math.min(100, Math.abs(increase)) + '%';
+
+                // Chart.js: material distribution (points per type)
+                const ctx = document.getElementById('statsChart').getContext('2d');
+                if (chartInstance) chartInstance.destroy();
+
+                const types = [...new Set(materials.map(m => m.name))];
+                const pointsByType = types.map(t => materials.filter(m => m.name === t).reduce((acc, m) => acc + m.points, 0));
+
+                chartInstance = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: types,
+                        datasets: [{
+                            data: pointsByType,
+                            backgroundColor: ['#0A3D2A', '#2f8e6b', '#6abf8a', '#a3d9b1'],
+                            borderWidth: 0
+                        }]
+                    },
+                    options: { plugins: { legend: { labels: { color: getComputedStyle(document.body).getPropertyValue('--text-primary') } } } }
+                });
+            }
+
+            // ----- ADD MATERIAL LOGIC -----
+            document.getElementById('addMaterialBtn').addEventListener('click', function() {
+                const name = document.getElementById('materialName').value;
+                const weight = parseFloat(document.getElementById('materialWeight').value);
+                if (!weight || weight <= 0) return alert('Enter valid weight in grams');
+                const fileInput = document.getElementById('materialImage');
+                const file = fileInput.files[0];
+
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        addMaterialToStore(name, weight, e.target.result);
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    addMaterialToStore(name, weight, null);
+                }
+            });
+
+            function addMaterialToStore(name, weight, imageBase64) {
+                const newMaterial = {
+                    id: Date.now() + Math.random(),
+                    name,
+                    weight,
+                    points: weight, // 1g = 1 point
+                    date: new Date().toISOString(),
+                    imageBase64: imageBase64 || null
+                };
+                materials.push(newMaterial);
+                saveMaterials();
+                // reset form
+                document.getElementById('materialWeight').value = '';
+                document.getElementById('materialImage').value = '';
+                // switch to My Materials section for feedback
+                switchSection('myMaterials');
+            }
+
+            // ----- SIDEBAR NAVIGATION -----
+            const menuItems = document.querySelectorAll('.menu-item');
+            const sections = document.querySelectorAll('.section');
+
+            function switchSection(sectionId) {
+                sections.forEach(s => s.classList.remove('active-section'));
+                document.getElementById(sectionId).classList.add('active-section');
+                menuItems.forEach(item => item.classList.remove('active'));
+                document.querySelector(`.menu-item[data-section="${sectionId}"]`).classList.add('active');
+                // re-render dynamic chart if stats opened
+                if (sectionId === 'statistics' && chartInstance) renderStatistics(); 
+            }
+
+            menuItems.forEach(item => {
+                item.addEventListener('click', (e) => {
+                    const section = item.getAttribute('data-section');
+                    switchSection(section);
+                });
+            });
+
+            // ----- DARK MODE -----
+            const themeToggle = document.getElementById('themeToggle');
+            const themeIcon = document.getElementById('themeIcon');
+            const body = document.body;
+
+            function setTheme(theme) {
+                if (theme === 'dark') {
+                    body.classList.add('dark');
+                    themeIcon.className = 'fas fa-moon';
+                } else {
+                    body.classList.remove('dark');
+                    themeIcon.className = 'fas fa-sun';
+                }
+                localStorage.setItem('bekyaTheme', theme);
+                if (chartInstance) renderStatistics(); // refresh chart colors
+            }
+
+            themeToggle.addEventListener('click', () => {
+                const newTheme = body.classList.contains('dark') ? 'light' : 'dark';
+                setTheme(newTheme);
+            });
+
+            // load saved theme
+            const savedTheme = localStorage.getItem('bekyaTheme') || 'light';
+            setTheme(savedTheme);
+
+            // ----- LANGUAGE TOGGLE (RTL/LTR) -----
+            const langToggle = document.getElementById('langToggle');
+            const langLabel = document.getElementById('langLabel');
+            const htmlElement = document.documentElement; // or body dir
+
+            function setLanguage(lang) {
+                if (lang === 'ar') {
+                    document.body.dir = 'rtl';
+                    langLabel.innerText = 'عربي';
+                    localStorage.setItem('bekyaLang', 'ar');
+                } else {
+                    document.body.dir = 'ltr';
+                    langLabel.innerText = 'English';
+                    localStorage.setItem('bekyaLang', 'en');
+                }
+            }
+
+            langToggle.addEventListener('click', () => {
+                const currentDir = document.body.dir || 'ltr';
+                const newLang = currentDir === 'ltr' ? 'ar' : 'en';
+                setLanguage(newLang);
+            });
+
+            // load saved language
+            const savedLang = localStorage.getItem('bekyaLang') || 'en';
+            setLanguage(savedLang);
+
+            // ----- LOAD INITIAL DATA & RENDER-----
+            renderAllSections();
+
+            // ensure profile shows on load, but active is overview
+            switchSection('overview');
+
+            // update statistics chart colors on theme change (already in setTheme)
+        })();
+    </script>
+</body>
+</html>
