@@ -501,6 +501,124 @@
 
     <script>
         (function() {
+            // ----- TRANSLATIONS -----
+            const translations = {
+                en: {
+                    // Header
+                    lightDark: "Light / Dark",
+                    // Sidebar
+                    navOverview: "Overview",
+                    navAddMaterial: "Add Material",
+                    navMyMaterials: "My Materials",
+                    navStatistics: "Statistics",
+                    navRewards: "Rewards / Points",
+                    navProfile: "Profile",
+                    // Section headings
+                    overviewTitle: "🌍 Overview",
+                    addMaterialTitle: "➕ Register material",
+                    myMaterialsTitle: "📦 My materials",
+                    statisticsTitle: "Statistics",
+                    rewardsTitle: "🏆 Rewards",
+                    profileTitle: "👤 Seller profile",
+                    // Overview cards
+                    totalMaterials: "Total materials",
+                    totalPoints: "Total points",
+                    impactMessage: "You helped recycle <strong>{weight}g</strong> of materials. Keep saving the planet! 🌱",
+                    recentUploads: "Recent uploads",
+                    // Add material
+                    materialType: "Material type",
+                    weightLabel: "Weight (grams)",
+                    weightPlaceholder: "e.g. 500",
+                    uploadImage: "Upload image",
+                    addButton: "Add material",
+                    // Material options
+                    aluminum: "Aluminum",
+                    plastic: "Plastic",
+                    paper: "Paper",
+                    glass: "Glass",
+                    // My materials
+                    noMaterials: "No materials added yet.",
+                    // Statistics
+                    totalGrams: "Total grams",
+                    totalPointsStat: "Total points",
+                    uploads: "Uploads",
+                    hourlyIncrease: "Hourly increase (last 24h vs previous)",
+                    // Rewards
+                    totalPointsRewards: "Total points:",
+                    nextMilestone: "Next milestone: 1000 pts",
+                    badgeText: "♻️ 500 pts = Bronze, 1000 pts = Silver, 5000 = Gold",
+                    // Profile
+                    name: "Name:",
+                    phone: "Phone:",
+                    role: "Role:",
+                    seller: "Seller",
+                    // Points suffix
+                    pointsSuffix: "pts",
+                    // Milestone text
+                    milestoneText: "{current}/1000",
+                    // No image alt
+                    noImage: "recycle",
+                    // Buttons
+                    saveIcon: '<i class="fas fa-save"></i> ',
+                },
+                ar: {
+                    lightDark: "خفيف / داكن",
+                    navOverview: "نظرة عامة",
+                    navAddMaterial: "إضافة مادة",
+                    navMyMaterials: "المواد الخاصة بي",
+                    navStatistics: "الإحصائيات",
+                    navRewards: "المكافآت / النقاط",
+                    navProfile: "الملف الشخصي",
+                    overviewTitle: "🌍 نظرة عامة",
+                    addMaterialTitle: "➕ تسجيل مادة",
+                    myMaterialsTitle: "📦 المواد الخاصة بي",
+                    statisticsTitle: "الإحصائيات",
+                    rewardsTitle: "🏆 المكافآت",
+                    profileTitle: "👤 الملف الشخصي للبائع",
+                    totalMaterials: "إجمالي المواد",
+                    totalPoints: "إجمالي النقاط",
+                    impactMessage: "لقد ساعدت في إعادة تدوير <strong>{weight}غ</strong> من المواد. حافظ على إنقاذ الكوكب! 🌱",
+                    recentUploads: "آخر الرفعات",
+                    materialType: "نوع المادة",
+                    weightLabel: "الوزن (غرام)",
+                    weightPlaceholder: "مثال: ٥٠٠",
+                    uploadImage: "رفع صورة",
+                    addButton: "إضافة مادة",
+                    aluminum: "ألمنيوم",
+                    plastic: "بلاستيك",
+                    paper: "ورق",
+                    glass: "زجاج",
+                    noMaterials: "لم تتم إضافة مواد بعد.",
+                    totalGrams: "إجمالي الغرامات",
+                    totalPointsStat: "إجمالي النقاط",
+                    uploads: "الرفعات",
+                    hourlyIncrease: "الزيادة كل ساعة (آخر ٢٤ ساعة مقابل السابقة)",
+                    totalPointsRewards: "إجمالي النقاط:",
+                    nextMilestone: "المرحلة التالية: ١٠٠٠ نقطة",
+                    badgeText: "♻️ ٥٠٠ نقطة = برونزي، ١٠٠٠ = فضي، ٥٠٠٠ = ذهبي",
+                    name: "الاسم:",
+                    phone: "الهاتف:",
+                    role: "الدور:",
+                    seller: "بائع",
+                    pointsSuffix: "نقطة",
+                    milestoneText: "{current}/١٠٠٠",
+                    noImage: "إعادة تدوير",
+                    saveIcon: '<i class="fas fa-save"></i> ',
+                }
+            };
+
+            // Current language
+            let currentLang = localStorage.getItem('bekyaLang') || 'en';
+
+            // Translation helper
+            function t(key, replacements = {}) {
+                let text = translations[currentLang][key] || translations.en[key] || key;
+                for (let [placeholder, value] of Object.entries(replacements)) {
+                    text = text.replace(`{${placeholder}}`, value);
+                }
+                return text;
+            }
+
             // ----- INITIAL STORAGE DEFAULTS -----
             if (!localStorage.getItem('userName')) localStorage.setItem('userName', 'Amina Al-Rashid');
             if (!localStorage.getItem('userPhone')) localStorage.setItem('userPhone', '+966 50 123 4567');
@@ -529,6 +647,7 @@
             function renderProfile() {
                 document.getElementById('profileName').innerText = localStorage.getItem('userName') || '—';
                 document.getElementById('profilePhone').innerText = localStorage.getItem('userPhone') || '—';
+                // Update static labels (already done by updateStaticText, but dynamic parts here)
             }
 
             // rewards
@@ -537,7 +656,8 @@
                 document.getElementById('rewardPoints').innerText = totalPoints;
                 const percent = Math.min(100, (totalPoints / 1000) * 100);
                 document.getElementById('milestoneBar').style.width = percent + '%';
-                document.getElementById('milestoneText').innerText = totalPoints + '/1000';
+                document.getElementById('milestoneText').innerText = t('milestoneText', { current: totalPoints });
+                // Update static labels (handled by updateStaticText)
             }
 
             // overview
@@ -547,7 +667,7 @@
                 const totalGrams = materials.reduce((acc, m) => acc + (m.weight || 0), 0);
                 document.getElementById('overviewTotalMaterials').innerText = totalMaterials;
                 document.getElementById('overviewTotalPoints').innerText = totalPoints;
-                document.getElementById('impactText').innerHTML = `You helped recycle <strong>${totalGrams}g</strong> of materials. Keep saving the planet! 🌱`;
+                document.getElementById('impactText').innerHTML = t('impactMessage', { weight: totalGrams });
 
                 // recent uploads (last 3)
                 const recent = [...materials].reverse().slice(0, 3);
@@ -557,12 +677,13 @@
                     const card = document.createElement('div');
                     card.className = 'material-card';
                     card.innerHTML = `
-                        <img src="${m.imageBase64 || 'https://via.placeholder.com/150?text=recycle'}" alt="material">
+                        <img src="${m.imageBase64 || 'https://via.placeholder.com/150?text=' + encodeURIComponent(t('noImage'))}" alt="${t('noImage')}">
                         <p><strong>${m.name}</strong> ${m.weight}g</p>
-                        <small>${new Date(m.date).toLocaleDateString()}</small>
+                        <small>${new Date(m.date).toLocaleDateString(currentLang === 'ar' ? 'ar-EG' : 'en-US')}</small>
                     `;
                     container.appendChild(card);
                 });
+                // Update static labels (handled by updateStaticText)
             }
 
             // my materials
@@ -570,16 +691,16 @@
                 const container = document.getElementById('materialsList');
                 container.innerHTML = '';
                 if (materials.length === 0) {
-                    container.innerHTML = '<p class="stat-card">No materials added yet.</p>';
+                    container.innerHTML = `<p class="stat-card">${t('noMaterials')}</p>`;
                     return;
                 }
                 materials.slice().reverse().forEach(m => {
                     const card = document.createElement('div');
                     card.className = 'material-card';
                     card.innerHTML = `
-                        <img src="${m.imageBase64 || 'https://via.placeholder.com/150?text=BEKYA'}" alt="img">
+                        <img src="${m.imageBase64 || 'https://via.placeholder.com/150?text=' + encodeURIComponent(t('noImage'))}" alt="${t('noImage')}">
                         <div class="flex-between"><span>${m.name}</span><span class="badge">${m.weight}g</span></div>
-                        <div class="flex-between"><span>⭐ ${m.points} pts</span><small>${new Date(m.date).toLocaleDateString()}</small></div>
+                        <div class="flex-between"><span>⭐ ${m.points} ${t('pointsSuffix')}</span><small>${new Date(m.date).toLocaleDateString(currentLang === 'ar' ? 'ar-EG' : 'en-US')}</small></div>
                     `;
                     container.appendChild(card);
                 });
@@ -628,6 +749,7 @@
                     },
                     options: { plugins: { legend: { labels: { color: getComputedStyle(document.body).getPropertyValue('--text-primary') } } } }
                 });
+                // Update static labels (handled by updateStaticText)
             }
 
             // ----- ADD MATERIAL LOGIC -----
@@ -713,12 +835,67 @@
             const savedTheme = localStorage.getItem('bekyaTheme') || 'light';
             setTheme(savedTheme);
 
-            // ----- LANGUAGE TOGGLE (RTL/LTR) -----
+            // ----- LANGUAGE TOGGLE (RTL/LTR + translations) -----
+            function updateStaticText() {
+                // Update theme toggle text
+                themeToggle.querySelector('span').innerText = t('lightDark');
+
+                // Update sidebar menu spans
+                const menuSpans = document.querySelectorAll('.menu-item span');
+                menuSpans[0].innerText = t('navOverview');
+                menuSpans[1].innerText = t('navAddMaterial');
+                menuSpans[2].innerText = t('navMyMaterials');
+                menuSpans[3].innerText = t('navStatistics');
+                menuSpans[4].innerText = t('navRewards');
+                menuSpans[5].innerText = t('navProfile');
+
+                // Update section headings
+                document.querySelector('#overview h2').innerHTML = t('overviewTitle');
+                document.querySelector('#addMaterial h2').innerHTML = t('addMaterialTitle');
+                document.querySelector('#myMaterials h2').innerHTML = t('myMaterialsTitle');
+                document.querySelector('#statistics h2').innerHTML = t('statisticsTitle');
+                document.querySelector('#rewards h2').innerHTML = t('rewardsTitle');
+                document.querySelector('#profile h2').innerHTML = t('profileTitle');
+
+                // Overview cards static labels (they are inside stat-card, but we'll regenerate via renderOverview)
+                // We'll rely on renderOverview for the cards, but we need to update the "Recent uploads" heading
+                document.querySelector('#overview h3').innerText = t('recentUploads');
+
+                // Add material form
+                const addLabels = document.querySelectorAll('#addMaterial .form-group label');
+                addLabels[0].innerText = t('materialType');
+                addLabels[1].innerText = t('weightLabel');
+                addLabels[2].innerText = t('uploadImage');
+                document.getElementById('materialWeight').placeholder = t('weightPlaceholder');
+                // Update select options
+                const select = document.getElementById('materialName');
+                select.options[0].text = t('aluminum');
+                select.options[1].text = t('plastic');
+                select.options[2].text = t('paper');
+                select.options[3].text = t('glass');
+                document.querySelector('#addMaterial .primary').innerHTML = t('saveIcon') + t('addButton');
+
+                // Statistics static cards (will be regenerated by renderStatistics, but we need to update the card titles)
+                // We'll rely on renderStatistics to regenerate them with translations
+
+                // Rewards static texts
+                const rewardCardSpans = document.querySelectorAll('#rewards .stat-card span');
+                rewardCardSpans[0].innerHTML = `${t('totalPointsRewards')} <span id="rewardPoints">${materials.reduce((acc, m) => acc + (m.points || 0), 0)}</span>`;
+                rewardCardSpans[1].innerText = t('nextMilestone');
+                document.querySelector('#rewards .badge').innerText = t('badgeText');
+
+                // Profile static labels
+                const profilePs = document.querySelectorAll('#profile .stat-card p');
+                profilePs[0].innerHTML = `<i class="fas fa-user"></i> <strong>${t('name')}</strong> <span id="profileName">${localStorage.getItem('userName')}</span>`;
+                profilePs[1].innerHTML = `<i class="fas fa-phone"></i> <strong>${t('phone')}</strong> <span id="profilePhone">${localStorage.getItem('userPhone')}</span>`;
+                profilePs[2].innerHTML = `<i class="fas fa-badge"></i> <strong>${t('role')}</strong> ${t('seller')}`;
+            }
+
             const langToggle = document.getElementById('langToggle');
             const langLabel = document.getElementById('langLabel');
-            const htmlElement = document.documentElement; // or body dir
 
             function setLanguage(lang) {
+                currentLang = lang;
                 if (lang === 'ar') {
                     document.body.dir = 'rtl';
                     langLabel.innerText = 'عربي';
@@ -728,6 +905,11 @@
                     langLabel.innerText = 'English';
                     localStorage.setItem('bekyaLang', 'en');
                 }
+                // Update all static text
+                updateStaticText();
+                // Re-render all dynamic sections with new language
+                renderAllSections();
+                // Update chart colors if needed (handled by renderStatistics)
             }
 
             langToggle.addEventListener('click', () => {
