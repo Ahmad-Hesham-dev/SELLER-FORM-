@@ -64,7 +64,7 @@
             width: 100%;
         }
 
-        /* ----- HEADER ----- */
+        /* ----- HEADER (now only logo) ----- */
         .header {
             display: flex;
             justify-content: space-between;
@@ -83,11 +83,6 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-        }
-
-        .header-controls {
-            display: flex;
-            gap: 1rem;
         }
 
         .toggle-btn {
@@ -117,7 +112,7 @@
             border-color: var(--accent-green);
         }
 
-        /* ----- DASHBOARD LAYOUT (flex, dir attribute controls sidebar side) ----- */
+        /* ----- DASHBOARD LAYOUT ----- */
         .dashboard-container {
             display: flex;
             gap: 2rem;
@@ -336,8 +331,12 @@
             align-items: center;
         }
 
-        .rtl .sidebar {
-            /* no extra needed because dir=rtl swaps order automatically */
+        .settings-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            max-width: 350px;
+            margin-top: 0.5rem;
         }
 
         /* responsive */
@@ -363,12 +362,11 @@
         @media (max-width: 480px) {
             .app-wrapper { padding: 1rem; }
             .header { flex-direction: column; align-items: start; }
-            .menu-item span { display: none; } /* icons only */
+            .menu-item span { display: none; }
             .menu-item i { margin: 0 auto; }
             .menu-item { justify-content: center; padding: 0.9rem; }
         }
 
-        /* environmental impact text */
         .impact-message {
             background: var(--accent-soft);
             border-radius: 50px;
@@ -382,85 +380,79 @@
 </head>
 <body dir="ltr">
     <div class="app-wrapper">
-        <!-- HEADER -->
+        <!-- HEADER (logo only) -->
         <header class="header">
             <div class="logo">BEKYA</div>
-            <div class="header-controls">
-                <!-- Dark mode toggle -->
-            
-           
-            </div>
         </header>
 
         <!-- DASHBOARD -->
         <div class="dashboard-container">
-            <!-- SIDEBAR (6 sections) -->
+            <!-- SIDEBAR (7 sections) -->
             <aside class="sidebar">
                 <nav class="sidebar-menu">
-                    <button class="menu-item active" data-section="overview"><i class="fas fa-home"></i> <span>Overview</span></button>
-                    <button class="menu-item" data-section="addMaterial"><i class="fas fa-plus-circle"></i> <span>Add Material</span></button>
-                    <button class="menu-item" data-section="myMaterials"><i class="fas fa-recycle"></i> <span>My Materials</span></button>
-                    <button class="menu-item" data-section="statistics"><i class="fas fa-chart-line"></i> <span>Statistics</span></button>
-                    <button class="menu-item" data-section="rewards"><i class="fas fa-gift"></i> <span>Rewards / Points</span></button>
-                    <button class="menu-item" data-section="profile"><i class="fas fa-user-circle"></i> <span>Profile</span></button>
-                    <button class="menu-item" data-section="Settings"><i class="fas fa-gear"></i> <span>Settings</span></button>
-                    
+                    <button class="menu-item active" data-section="overview"><i class="fas fa-home"></i> <span data-i18n="menu_overview">Overview</span></button>
+                    <button class="menu-item" data-section="addMaterial"><i class="fas fa-plus-circle"></i> <span data-i18n="menu_addMaterial">Add Material</span></button>
+                    <button class="menu-item" data-section="myMaterials"><i class="fas fa-recycle"></i> <span data-i18n="menu_myMaterials">My Materials</span></button>
+                    <button class="menu-item" data-section="statistics"><i class="fas fa-chart-line"></i> <span data-i18n="menu_statistics">Statistics</span></button>
+                    <button class="menu-item" data-section="rewards"><i class="fas fa-gift"></i> <span data-i18n="menu_rewards">Rewards / Points</span></button>
+                    <button class="menu-item" data-section="profile"><i class="fas fa-user-circle"></i> <span data-i18n="menu_profile">Profile</span></button>
+                    <button class="menu-item" data-section="settings"><i class="fas fa-cog"></i> <span data-i18n="menu_settings">Settings</span></button>
                 </nav>
             </aside>
 
-            <!-- MAIN CONTENT (sections) -->
+            <!-- MAIN CONTENT -->
             <main class="main-content">
                 <!-- OVERVIEW SECTION -->
                 <section id="overview" class="section active-section">
-                    <h2>🌍 Overview</h2>
+                    <h2 data-i18n="heading_overview">🌍 Overview</h2>
                     <div class="card-grid">
-                        <div class="stat-card"><i class="fas fa-boxes"></i> Total materials <span class="stat-value" id="overviewTotalMaterials">0</span></div>
-                        <div class="stat-card"><i class="fas fa-coins"></i> Total points <span class="stat-value" id="overviewTotalPoints">0</span></div>
+                        <div class="stat-card"><i class="fas fa-boxes"></i> <span data-i18n="total_materials">Total materials</span> <span class="stat-value" id="overviewTotalMaterials">0</span></div>
+                        <div class="stat-card"><i class="fas fa-coins"></i> <span data-i18n="total_points">Total points</span> <span class="stat-value" id="overviewTotalPoints">0</span></div>
                     </div>
                     <div class="impact-message" id="impactText">You helped recycle <strong>0g</strong> of materials. Keep saving the planet! 🌱</div>
-                    <h3 style="margin-top:2rem;">Recent uploads</h3>
+                    <h3 style="margin-top:2rem;" data-i18n="recent_uploads">Recent uploads</h3>
                     <div id="recentUploads" class="materials-grid" style="grid-template-columns:repeat(auto-fill, minmax(200px,1fr));"></div>
                 </section>
 
                 <!-- ADD MATERIAL SECTION -->
                 <section id="addMaterial" class="section">
-                    <h2>➕ Register material</h2>
+                    <h2 data-i18n="heading_addMaterial">➕ Register material</h2>
                     <div class="form-group">
-                        <label>Material type</label>
+                        <label data-i18n="material_type">Material type</label>
                         <select id="materialName">
-                            <option value="Aluminum">Aluminum</option>
-                            <option value="Plastic">Plastic</option>
-                            <option value="Paper">Paper</option>
-                            <option value="Glass">Glass</option>
+                            <option value="Aluminum" data-i18n="aluminum">Aluminum</option>
+                            <option value="Plastic" data-i18n="plastic">Plastic</option>
+                            <option value="Paper" data-i18n="paper">Paper</option>
+                            <option value="Glass" data-i18n="glass">Glass</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Weight (grams)</label>
-                        <input type="number" id="materialWeight" placeholder="e.g. 500" min="1">
+                        <label data-i18n="weight_grams">Weight (grams)</label>
+                        <input type="number" id="materialWeight" placeholder="e.g. 500" min="1" data-i18n-placeholder="weight_placeholder">
                     </div>
                     <div class="form-group">
-                        <label>Upload image</label>
+                        <label data-i18n="upload_image">Upload image</label>
                         <input type="file" id="materialImage" accept="image/*">
                     </div>
-                    <button class="primary" id="addMaterialBtn"><i class="fas fa-save"></i> Add material</button>
+                    <button class="primary" id="addMaterialBtn"><i class="fas fa-save"></i> <span data-i18n="add_material_btn">Add material</span></button>
                 </section>
 
                 <!-- MY MATERIALS SECTION -->
                 <section id="myMaterials" class="section">
-                    <h2>📦 My materials</h2>
+                    <h2 data-i18n="heading_myMaterials">📦 My materials</h2>
                     <div id="materialsList" class="materials-grid"></div>
                 </section>
 
                 <!-- STATISTICS SECTION -->
                 <section id="statistics" class="section">
-                    <h2> Statistics</h2>
+                    <h2 data-i18n="heading_statistics">📊 Statistics</h2>
                     <div class="card-grid">
-                        <div class="stat-card"><span>Total grams</span><span class="stat-value" id="statTotalGrams">0</span></div>
-                        <div class="stat-card"><span>Total points</span><span class="stat-value" id="statTotalPoints">0</span></div>
-                        <div class="stat-card"><span>Uploads</span><span class="stat-value" id="statUploads">0</span></div>
+                        <div class="stat-card"><span data-i18n="total_grams">Total grams</span><span class="stat-value" id="statTotalGrams">0</span></div>
+                        <div class="stat-card"><span data-i18n="total_points_stat">Total points</span><span class="stat-value" id="statTotalPoints">0</span></div>
+                        <div class="stat-card"><span data-i18n="uploads">Uploads</span><span class="stat-value" id="statUploads">0</span></div>
                     </div>
                     <div class="stat-card">
-                        <span> Hourly increase (last 24h vs previous)</span>
+                        <span data-i18n="hourly_increase">Hourly increase (last 24h vs previous)</span>
                         <div class="stat-value" id="hourlyIncrease">+0%</div>
                         <div class="progress"><div class="progress-bar" id="increaseBar" style="width:0%"></div></div>
                     </div>
@@ -469,164 +461,169 @@
 
                 <!-- REWARDS SECTION -->
                 <section id="rewards" class="section">
-                    <h2>🏆 Rewards</h2>
+                    <h2 data-i18n="heading_rewards">🏆 Rewards</h2>
                     <div class="stat-card">
-                        <i class="fas fa-star"></i> Total points: <span id="rewardPoints">0</span>
+                        <i class="fas fa-star"></i> <span data-i18n="total_points_rewards">Total points:</span> <span id="rewardPoints">0</span>
                     </div>
                     <div class="stat-card">
-                        <span>Next milestone: 1000 pts</span>
+                        <span data-i18n="next_milestone">Next milestone: 1000 pts</span>
                         <div class="progress"><div class="progress-bar" id="milestoneBar" style="width:0%"></div></div>
                         <p id="milestoneText">0/1000</p>
                     </div>
-                    <div class="badge">♻️ 500 pts = Bronze, 1000 pts = Silver, 5000 = Gold</div>
+                    <div class="badge" data-i18n="milestone_badge">♻️ 500 pts = Bronze, 1000 pts = Silver, 5000 = Gold</div>
                 </section>
 
                 <!-- PROFILE SECTION -->
                 <section id="profile" class="section">
-                    <h2>👤 Seller profile</h2>
+                    <h2 data-i18n="heading_profile">👤 Seller profile</h2>
                     <div class="stat-card">
-                        <p><i class="fas fa-user"></i> <strong>Name:</strong> <span id="profileName"></span></p>
-                        <p><i class="fas fa-phone"></i> <strong>Phone:</strong> <span id="profilePhone"></span></p>
-                        <p><i class="fas fa-badge"></i> <strong>Role:</strong> Seller</p>
+                        <p><i class="fas fa-user"></i> <strong data-i18n="name">Name:</strong> <span id="profileName"></span></p>
+                        <p><i class="fas fa-phone"></i> <strong data-i18n="phone">Phone:</strong> <span id="profilePhone"></span></p>
+                        <p><i class="fas fa-badge"></i> <strong data-i18n="role">Role:</strong> <span data-i18n="seller">Seller</span></p>
                     </div>
                 </section>
-                
-  <section id="settings" class="section settings-section">
-                    <h2> Settings</h2>
-                  <button class="toggle-btn" id="themeToggle" aria-label="Toggle theme">
-                    <i id="themeIcon" class="fas fa-sun"></i>
-                    <span>Light / Dark</span>
-                </button>
-\                   <!-- Language toggle -->
-                <button class="toggle-btn" id="langToggle" aria-label="Toggle language">
-                    <i class="fas fa-language"></i>
-                    <span id="langLabel">English</span>
-                </button>
-                </section>
 
-                
+                <!-- SETTINGS SECTION with moved toggle buttons -->
+                <section id="settings" class="section">
+                    <h2 data-i18n="heading_settings">⚙️ Settings</h2>
+                    <div class="settings-buttons">
+                        <!-- Dark mode toggle (same button) -->
+                        <button class="toggle-btn" id="themeToggle" aria-label="Toggle theme">
+                            <i id="themeIcon" class="fas fa-sun"></i>
+                            <span data-i18n="theme_toggle">Light / Dark</span>
+                        </button>
+                        <!-- Language toggle (same button) -->
+                        <button class="toggle-btn" id="langToggle" aria-label="Toggle language">
+                            <i class="fas fa-language"></i>
+                            <span id="langLabel" data-i18n="lang_toggle">English</span>
+                        </button>
+                    </div>
+                    <p style="margin-top: 2rem; color: var(--text-secondary);" data-i18n="settings_note">Theme and language toggles — same functionality.</p>
+                </section>
             </main>
         </div>
     </div>
 
     <script>
         (function() {
-            // ----- TRANSLATIONS -----
+            // ----- TRANSLATION DICTIONARY -----
             const translations = {
                 en: {
-                    // Header
-                    lightDark: "Light / Dark",
-                    // Sidebar
-                    navOverview: "Overview",
-                    navAddMaterial: "Add Material",
-                    navMyMaterials: "My Materials",
-                    navStatistics: "Statistics",
-                    navRewards: "Rewards / Points",
-                    navProfile: "Profile",
-                    // Section headings
-                    overviewTitle: "🌍 Overview",
-                    addMaterialTitle: "➕ Register material",
-                    myMaterialsTitle: "📦 My materials",
-                    statisticsTitle: "Statistics",
-                    rewardsTitle: "🏆 Rewards",
-                    profileTitle: "👤 Seller profile",
-                    // Overview cards
-                    totalMaterials: "Total materials",
-                    totalPoints: "Total points",
-                    impactMessage: "You helped recycle <strong>{weight}g</strong> of materials. Keep saving the planet! 🌱",
-                    recentUploads: "Recent uploads",
-                    // Add material
-                    materialType: "Material type",
-                    weightLabel: "Weight (grams)",
-                    weightPlaceholder: "e.g. 500",
-                    uploadImage: "Upload image",
-                    addButton: "Add material",
-                    // Material options
+                    menu_overview: "Overview",
+                    menu_addMaterial: "Add Material",
+                    menu_myMaterials: "My Materials",
+                    menu_statistics: "Statistics",
+                    menu_rewards: "Rewards / Points",
+                    menu_profile: "Profile",
+                    menu_settings: "Settings",
+                    heading_overview: "🌍 Overview",
+                    heading_addMaterial: "➕ Register material",
+                    heading_myMaterials: "📦 My materials",
+                    heading_statistics: "📊 Statistics",
+                    heading_rewards: "🏆 Rewards",
+                    heading_profile: "👤 Seller profile",
+                    heading_settings: "⚙️ Settings",
+                    total_materials: "Total materials",
+                    total_points: "Total points",
+                    recent_uploads: "Recent uploads",
+                    material_type: "Material type",
                     aluminum: "Aluminum",
                     plastic: "Plastic",
                     paper: "Paper",
                     glass: "Glass",
-                    // My materials
-                    noMaterials: "No materials added yet.",
-                    // Statistics
-                    totalGrams: "Total grams",
-                    totalPointsStat: "Total points",
+                    weight_grams: "Weight (grams)",
+                    weight_placeholder: "e.g. 500",
+                    upload_image: "Upload image",
+                    add_material_btn: "Add material",
+                    total_grams: "Total grams",
+                    total_points_stat: "Total points",
                     uploads: "Uploads",
-                    hourlyIncrease: "Hourly increase (last 24h vs previous)",
-                    // Rewards
-                    totalPointsRewards: "Total points:",
-                    nextMilestone: "Next milestone: 1000 pts",
-                    badgeText: "♻️ 500 pts = Bronze, 1000 pts = Silver, 5000 = Gold",
-                    // Profile
+                    hourly_increase: "Hourly increase (last 24h vs previous)",
+                    total_points_rewards: "Total points:",
+                    next_milestone: "Next milestone: 1000 pts",
+                    milestone_badge: "♻️ 500 pts = Bronze, 1000 pts = Silver, 5000 = Gold",
                     name: "Name:",
                     phone: "Phone:",
                     role: "Role:",
                     seller: "Seller",
-                    // Points suffix
-                    pointsSuffix: "pts",
-                    // Milestone text
-                    milestoneText: "{current}/1000",
-                    // No image alt
-                    noImage: "recycle",
-                    // Buttons
-                    saveIcon: '<i class="fas fa-save"></i> ',
+                    theme_toggle: "Light / Dark",
+                    lang_toggle: "English",
+                    settings_note: "Theme and language toggles — same functionality.",
+                    no_materials: "No materials added yet.",
+                    impact_message: "You helped recycle <strong>{grams}g</strong> of materials. Keep saving the planet! 🌱"
                 },
                 ar: {
-                    lightDark: "خفيف / داكن",
-                    navOverview: "نظرة عامة",
-                    navAddMaterial: "إضافة مادة",
-                    navMyMaterials: "المواد الخاصة بي",
-                    navStatistics: "الإحصائيات",
-                    navRewards: "المكافآت / النقاط",
-                    navProfile: "الملف الشخصي",
-                    overviewTitle: "🌍 نظرة عامة",
-                    addMaterialTitle: "➕ تسجيل مادة",
-                    myMaterialsTitle: "📦 المواد الخاصة بي",
-                    statisticsTitle: "الإحصائيات",
-                    rewardsTitle: "🏆 المكافآت",
-                    profileTitle: "👤 الملف الشخصي للبائع",
-                    totalMaterials: "إجمالي المواد",
-                    totalPoints: "إجمالي النقاط",
-                    impactMessage: "لقد ساعدت في إعادة تدوير <strong>{weight}غ</strong> من المواد. حافظ على إنقاذ الكوكب! 🌱",
-                    recentUploads: "آخر الرفعات",
-                    materialType: "نوع المادة",
-                    weightLabel: "الوزن (غرام)",
-                    weightPlaceholder: "مثال: ٥٠٠",
-                    uploadImage: "رفع صورة",
-                    addButton: "إضافة مادة",
-                    aluminum: "ألمنيوم",
+                    menu_overview: "نظرة عامة",
+                    menu_addMaterial: "إضافة مادة",
+                    menu_myMaterials: "المواد الخاصة بي",
+                    menu_statistics: "الإحصائيات",
+                    menu_rewards: "المكافآت / النقاط",
+                    menu_profile: "الملف الشخصي",
+                    menu_settings: "الإعدادات",
+                    heading_overview: "🌍 نظرة عامة",
+                    heading_addMaterial: "➕ تسجيل مادة",
+                    heading_myMaterials: "📦 المواد الخاصة بي",
+                    heading_statistics: "📊 الإحصائيات",
+                    heading_rewards: "🏆 المكافآت",
+                    heading_profile: "👤 ملف البائع",
+                    heading_settings: "⚙️ الإعدادات",
+                    total_materials: "إجمالي المواد",
+                    total_points: "إجمالي النقاط",
+                    recent_uploads: "آخر الرفعات",
+                    material_type: "نوع المادة",
+                    aluminum: "ألومنيوم",
                     plastic: "بلاستيك",
                     paper: "ورق",
                     glass: "زجاج",
-                    noMaterials: "لم تتم إضافة مواد بعد.",
-                    totalGrams: "إجمالي الغرامات",
-                    totalPointsStat: "إجمالي النقاط",
+                    weight_grams: "الوزن (جرام)",
+                    weight_placeholder: "مثال: 500",
+                    upload_image: "رفع صورة",
+                    add_material_btn: "إضافة مادة",
+                    total_grams: "إجمالي الجرامات",
+                    total_points_stat: "إجمالي النقاط",
                     uploads: "الرفعات",
-                    hourlyIncrease: "الزيادة كل ساعة (آخر ٢٤ ساعة مقابل السابقة)",
-                    totalPointsRewards: "إجمالي النقاط:",
-                    nextMilestone: "المرحلة التالية: ١٠٠٠ نقطة",
-                    badgeText: "♻️ ٥٠٠ نقطة = برونزي، ١٠٠٠ = فضي، ٥٠٠٠ = ذهبي",
+                    hourly_increase: "الزيادة خلال آخر 24 ساعة مقارنة بالسابقة",
+                    total_points_rewards: "إجمالي النقاط:",
+                    next_milestone: "الهدف التالي: 1000 نقطة",
+                    milestone_badge: "♻️ 500 نقطة = برونزي، 1000 = فضي، 5000 = ذهبي",
                     name: "الاسم:",
                     phone: "الهاتف:",
                     role: "الدور:",
                     seller: "بائع",
-                    pointsSuffix: "نقطة",
-                    milestoneText: "{current}/١٠٠٠",
-                    noImage: "إعادة تدوير",
-                    saveIcon: '<i class="fas fa-save"></i> ',
+                    theme_toggle: "فاتح / داكن",
+                    lang_toggle: "عربي",
+                    settings_note: "أزرار السمة واللغة — نفس الوظائف.",
+                    no_materials: "لا توجد مواد مضافة بعد.",
+                    impact_message: "لقد ساعدت في إعادة تدوير <strong>{grams}g</strong> من المواد. استمر في إنقاذ الكوكب! 🌱"
                 }
             };
 
-            // Current language
-            let currentLang = localStorage.getItem('bekyaLang') || 'en';
+            // ----- HELPER: GET CURRENT LANGUAGE -----
+            function getCurrentLang() {
+                return document.body.dir === 'rtl' ? 'ar' : 'en';
+            }
 
-            // Translation helper
-            function t(key, replacements = {}) {
-                let text = translations[currentLang][key] || translations.en[key] || key;
-                for (let [placeholder, value] of Object.entries(replacements)) {
-                    text = text.replace(`{${placeholder}}`, value);
-                }
-                return text;
+            // ----- APPLY TRANSLATIONS TO STATIC ELEMENTS -----
+            function applyTranslations(lang) {
+                const elements = document.querySelectorAll('[data-i18n]');
+                elements.forEach(el => {
+                    const key = el.getAttribute('data-i18n');
+                    if (translations[lang] && translations[lang][key]) {
+                        if (el.tagName === 'OPTION') {
+                            el.textContent = translations[lang][key];
+                        } else {
+                            el.innerHTML = translations[lang][key]; // allow html like emoji
+                        }
+                    }
+                });
+                // placeholders
+                const placeholders = document.querySelectorAll('[data-i18n-placeholder]');
+                placeholders.forEach(el => {
+                    const key = el.getAttribute('data-i18n-placeholder');
+                    if (translations[lang] && translations[lang][key]) {
+                        el.placeholder = translations[lang][key];
+                    }
+                });
             }
 
             // ----- INITIAL STORAGE DEFAULTS -----
@@ -644,7 +641,7 @@
                 renderAllSections();
             }
 
-            // ----- RENDER ALL SECTIONS -----
+            // ----- RENDER ALL SECTIONS (modified to use translations) -----
             function renderAllSections() {
                 renderMyMaterials();
                 renderStatistics();
@@ -653,11 +650,10 @@
                 renderProfile();
             }
 
-            // profile
+            // profile (dynamic content remains unchanged)
             function renderProfile() {
                 document.getElementById('profileName').innerText = localStorage.getItem('userName') || '—';
                 document.getElementById('profilePhone').innerText = localStorage.getItem('userPhone') || '—';
-                // Update static labels (already done by updateStaticText, but dynamic parts here)
             }
 
             // rewards
@@ -666,18 +662,21 @@
                 document.getElementById('rewardPoints').innerText = totalPoints;
                 const percent = Math.min(100, (totalPoints / 1000) * 100);
                 document.getElementById('milestoneBar').style.width = percent + '%';
-                document.getElementById('milestoneText').innerText = t('milestoneText', { current: totalPoints });
-                // Update static labels (handled by updateStaticText)
+                document.getElementById('milestoneText').innerText = totalPoints + '/1000';
             }
 
-            // overview
+            // overview (now uses translation for impact message)
             function renderOverview() {
                 const totalMaterials = materials.length;
                 const totalPoints = materials.reduce((acc, m) => acc + (m.points || 0), 0);
                 const totalGrams = materials.reduce((acc, m) => acc + (m.weight || 0), 0);
                 document.getElementById('overviewTotalMaterials').innerText = totalMaterials;
                 document.getElementById('overviewTotalPoints').innerText = totalPoints;
-                document.getElementById('impactText').innerHTML = t('impactMessage', { weight: totalGrams });
+
+                // Impact message with translation
+                const lang = getCurrentLang();
+                const impactTemplate = translations[lang]?.impact_message || translations.en.impact_message;
+                document.getElementById('impactText').innerHTML = impactTemplate.replace('{grams}', totalGrams);
 
                 // recent uploads (last 3)
                 const recent = [...materials].reverse().slice(0, 3);
@@ -687,36 +686,37 @@
                     const card = document.createElement('div');
                     card.className = 'material-card';
                     card.innerHTML = `
-                        <img src="${m.imageBase64 || 'https://via.placeholder.com/150?text=' + encodeURIComponent(t('noImage'))}" alt="${t('noImage')}">
+                        <img src="${m.imageBase64 || 'https://via.placeholder.com/150?text=recycle'}" alt="material">
                         <p><strong>${m.name}</strong> ${m.weight}g</p>
-                        <small>${new Date(m.date).toLocaleDateString(currentLang === 'ar' ? 'ar-EG' : 'en-US')}</small>
+                        <small>${new Date(m.date).toLocaleDateString()}</small>
                     `;
                     container.appendChild(card);
                 });
-                // Update static labels (handled by updateStaticText)
             }
 
-            // my materials
+            // my materials (translated empty message)
             function renderMyMaterials() {
                 const container = document.getElementById('materialsList');
                 container.innerHTML = '';
                 if (materials.length === 0) {
-                    container.innerHTML = `<p class="stat-card">${t('noMaterials')}</p>`;
+                    const lang = getCurrentLang();
+                    const msg = translations[lang]?.no_materials || translations.en.no_materials;
+                    container.innerHTML = `<p class="stat-card">${msg}</p>`;
                     return;
                 }
                 materials.slice().reverse().forEach(m => {
                     const card = document.createElement('div');
                     card.className = 'material-card';
                     card.innerHTML = `
-                        <img src="${m.imageBase64 || 'https://via.placeholder.com/150?text=' + encodeURIComponent(t('noImage'))}" alt="${t('noImage')}">
+                        <img src="${m.imageBase64 || 'https://via.placeholder.com/150?text=BEKYA'}" alt="img">
                         <div class="flex-between"><span>${m.name}</span><span class="badge">${m.weight}g</span></div>
-                        <div class="flex-between"><span>⭐ ${m.points} ${t('pointsSuffix')}</span><small>${new Date(m.date).toLocaleDateString(currentLang === 'ar' ? 'ar-EG' : 'en-US')}</small></div>
+                        <div class="flex-between"><span>⭐ ${m.points} pts</span><small>${new Date(m.date).toLocaleDateString()}</small></div>
                     `;
                     container.appendChild(card);
                 });
             }
 
-            // statistics
+            // statistics (uncharted parts stay)
             function renderStatistics() {
                 const totalGrams = materials.reduce((acc, m) => acc + (m.weight || 0), 0);
                 const totalPoints = materials.reduce((acc, m) => acc + (m.points || 0), 0);
@@ -725,7 +725,6 @@
                 document.getElementById('statTotalPoints').innerText = totalPoints;
                 document.getElementById('statUploads').innerText = uploads;
 
-                // hourly increase (last 24h vs previous 24h)
                 const now = Date.now();
                 const oneDay = 24 * 60 * 60 * 1000;
                 const last24 = materials.filter(m => (now - new Date(m.date).getTime()) <= oneDay).reduce((acc, m) => acc + m.weight, 0);
@@ -740,7 +739,6 @@
                 document.getElementById('hourlyIncrease').innerText = (increase > 0 ? '+' : '') + increase.toFixed(1) + '%';
                 document.getElementById('increaseBar').style.width = Math.min(100, Math.abs(increase)) + '%';
 
-                // Chart.js: material distribution (points per type)
                 const ctx = document.getElementById('statsChart').getContext('2d');
                 if (chartInstance) chartInstance.destroy();
 
@@ -759,10 +757,9 @@
                     },
                     options: { plugins: { legend: { labels: { color: getComputedStyle(document.body).getPropertyValue('--text-primary') } } } }
                 });
-                // Update static labels (handled by updateStaticText)
             }
 
-            // ----- ADD MATERIAL LOGIC -----
+            // ----- ADD MATERIAL LOGIC (unchanged) -----
             document.getElementById('addMaterialBtn').addEventListener('click', function() {
                 const name = document.getElementById('materialName').value;
                 const weight = parseFloat(document.getElementById('materialWeight').value);
@@ -786,20 +783,18 @@
                     id: Date.now() + Math.random(),
                     name,
                     weight,
-                    points: weight, // 1g = 1 point
+                    points: weight,
                     date: new Date().toISOString(),
                     imageBase64: imageBase64 || null
                 };
                 materials.push(newMaterial);
                 saveMaterials();
-                // reset form
                 document.getElementById('materialWeight').value = '';
                 document.getElementById('materialImage').value = '';
-                // switch to My Materials section for feedback
                 switchSection('myMaterials');
             }
 
-            // ----- SIDEBAR NAVIGATION -----
+            // ----- SIDEBAR NAVIGATION (unchanged) -----
             const menuItems = document.querySelectorAll('.menu-item');
             const sections = document.querySelectorAll('.section');
 
@@ -808,8 +803,7 @@
                 document.getElementById(sectionId).classList.add('active-section');
                 menuItems.forEach(item => item.classList.remove('active'));
                 document.querySelector(`.menu-item[data-section="${sectionId}"]`).classList.add('active');
-                // re-render dynamic chart if stats opened
-                if (sectionId === 'statistics' && chartInstance) renderStatistics(); 
+                if (sectionId === 'statistics' && chartInstance) renderStatistics();
             }
 
             menuItems.forEach(item => {
@@ -819,7 +813,7 @@
                 });
             });
 
-            // ----- DARK MODE -----
+            // ----- DARK MODE (unchanged) -----
             const themeToggle = document.getElementById('themeToggle');
             const themeIcon = document.getElementById('themeIcon');
             const body = document.body;
@@ -833,7 +827,7 @@
                     themeIcon.className = 'fas fa-sun';
                 }
                 localStorage.setItem('bekyaTheme', theme);
-                if (chartInstance) renderStatistics(); // refresh chart colors
+                if (chartInstance) renderStatistics();
             }
 
             themeToggle.addEventListener('click', () => {
@@ -841,85 +835,26 @@
                 setTheme(newTheme);
             });
 
-            // load saved theme
             const savedTheme = localStorage.getItem('bekyaTheme') || 'light';
             setTheme(savedTheme);
 
-            // ----- LANGUAGE TOGGLE (RTL/LTR + translations) -----
-            function updateStaticText() {
-                // Update theme toggle text
-                themeToggle.querySelector('span').innerText = t('lightDark');
-
-                // Update sidebar menu spans
-                const menuSpans = document.querySelectorAll('.menu-item span');
-                menuSpans[0].innerText = t('navOverview');
-                menuSpans[1].innerText = t('navAddMaterial');
-                menuSpans[2].innerText = t('navMyMaterials');
-                menuSpans[3].innerText = t('navStatistics');
-                menuSpans[4].innerText = t('navRewards');
-                menuSpans[5].innerText = t('navProfile');
-
-                // Update section headings
-                document.querySelector('#overview h2').innerHTML = t('overviewTitle');
-                document.querySelector('#addMaterial h2').innerHTML = t('addMaterialTitle');
-                document.querySelector('#myMaterials h2').innerHTML = t('myMaterialsTitle');
-                document.querySelector('#statistics h2').innerHTML = t('statisticsTitle');
-                document.querySelector('#rewards h2').innerHTML = t('rewardsTitle');
-                document.querySelector('#profile h2').innerHTML = t('profileTitle');
-
-                // Overview cards static labels (they are inside stat-card, but we'll regenerate via renderOverview)
-                // We'll rely on renderOverview for the cards, but we need to update the "Recent uploads" heading
-                document.querySelector('#overview h3').innerText = t('recentUploads');
-
-                // Add material form
-                const addLabels = document.querySelectorAll('#addMaterial .form-group label');
-                addLabels[0].innerText = t('materialType');
-                addLabels[1].innerText = t('weightLabel');
-                addLabels[2].innerText = t('uploadImage');
-                document.getElementById('materialWeight').placeholder = t('weightPlaceholder');
-                // Update select options
-                const select = document.getElementById('materialName');
-                select.options[0].text = t('aluminum');
-                select.options[1].text = t('plastic');
-                select.options[2].text = t('paper');
-                select.options[3].text = t('glass');
-                document.querySelector('#addMaterial .primary').innerHTML = t('saveIcon') + t('addButton');
-
-                // Statistics static cards (will be regenerated by renderStatistics, but we need to update the card titles)
-                // We'll rely on renderStatistics to regenerate them with translations
-
-                // Rewards static texts
-                const rewardCardSpans = document.querySelectorAll('#rewards .stat-card span');
-                rewardCardSpans[0].innerHTML = `${t('totalPointsRewards')} <span id="rewardPoints">${materials.reduce((acc, m) => acc + (m.points || 0), 0)}</span>`;
-                rewardCardSpans[1].innerText = t('nextMilestone');
-                document.querySelector('#rewards .badge').innerText = t('badgeText');
-
-                // Profile static labels
-                const profilePs = document.querySelectorAll('#profile .stat-card p');
-                profilePs[0].innerHTML = `<i class="fas fa-user"></i> <strong>${t('name')}</strong> <span id="profileName">${localStorage.getItem('userName')}</span>`;
-                profilePs[1].innerHTML = `<i class="fas fa-phone"></i> <strong>${t('phone')}</strong> <span id="profilePhone">${localStorage.getItem('userPhone')}</span>`;
-                profilePs[2].innerHTML = `<i class="fas fa-badge"></i> <strong>${t('role')}</strong> ${t('seller')}`;
-            }
-
+            // ----- LANGUAGE TOGGLE (now with full translation) -----
             const langToggle = document.getElementById('langToggle');
-            const langLabel = document.getElementById('langLabel');
 
             function setLanguage(lang) {
-                currentLang = lang;
                 if (lang === 'ar') {
                     document.body.dir = 'rtl';
-                    langLabel.innerText = 'عربي';
                     localStorage.setItem('bekyaLang', 'ar');
                 } else {
                     document.body.dir = 'ltr';
-                    langLabel.innerText = 'English';
                     localStorage.setItem('bekyaLang', 'en');
                 }
-                // Update all static text
-                updateStaticText();
-                // Re-render all dynamic sections with new language
+                // Apply translations to all static elements
+                applyTranslations(lang);
+                // Re-render dynamic sections that contain translatable text
                 renderAllSections();
-                // Update chart colors if needed (handled by renderStatistics)
+                // Update chart colors if visible (theme change may affect)
+                if (chartInstance) renderStatistics();
             }
 
             langToggle.addEventListener('click', () => {
@@ -928,17 +863,13 @@
                 setLanguage(newLang);
             });
 
-            // load saved language
+            // load saved language and apply translations
             const savedLang = localStorage.getItem('bekyaLang') || 'en';
             setLanguage(savedLang);
 
-            // ----- LOAD INITIAL DATA & RENDER-----
+            // ----- LOAD INITIAL DATA -----
             renderAllSections();
-
-            // ensure profile shows on load, but active is overview
             switchSection('overview');
-
-            // update statistics chart colors on theme change (already in setTheme)
         })();
     </script>
 </body>
