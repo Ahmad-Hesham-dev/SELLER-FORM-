@@ -10,6 +10,7 @@
     <!-- Chart.js CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
+        /* (existing styles – unchanged) */
         * {
             margin: 0;
             padding: 0;
@@ -310,7 +311,7 @@
             padding: 1rem;
             border: 1px solid var(--border-light);
             transition: all 0.2s;
-            position: relative; /* added for delete icon positioning */
+            position: relative;
         }
 
         .material-card:hover {
@@ -326,7 +327,6 @@
             background: #d9d9d9;
         }
 
-        /* Delete icon style (added) */
         .delete-icon {
             position: absolute;
             top: 8px;
@@ -370,7 +370,6 @@
             margin-top: 0.5rem;
         }
 
-        /* responsive */
         @media (max-width: 900px) {
             .dashboard-container {
                 flex-direction: column;
@@ -537,6 +536,9 @@
 
     <script>
         (function() {
+            // ----- Added for userId integration -----
+            const currentUserId = localStorage.getItem('currentUserId');   // read logged-in user ID
+
             // ----- TRANSLATION DICTIONARY -----
             const translations = {
                 en: {
@@ -643,11 +645,10 @@
                         if (el.tagName === 'OPTION') {
                             el.textContent = translations[lang][key];
                         } else {
-                            el.innerHTML = translations[lang][key]; // allow html like emoji
+                            el.innerHTML = translations[lang][key];
                         }
                     }
                 });
-                // placeholders
                 const placeholders = document.querySelectorAll('[data-i18n-placeholder]');
                 placeholders.forEach(el => {
                     const key = el.getAttribute('data-i18n-placeholder');
@@ -672,7 +673,7 @@
                 renderAllSections();
             }
 
-            // ----- RENDER ALL SECTIONS (modified to use translations) -----
+            // ----- RENDER ALL SECTIONS (modified to filter by userId) -----
             function renderAllSections() {
                 renderMyMaterials();
                 renderStatistics();
@@ -681,36 +682,37 @@
                 renderProfile();
             }
 
-            // profile (dynamic content remains unchanged)
+            // profile (unchanged)
             function renderProfile() {
                 document.getElementById('profileName').innerText = localStorage.getItem('userName') || '—';
                 document.getElementById('profilePhone').innerText = localStorage.getItem('userPhone') || '—';
             }
 
-            // rewards
+            // rewards – MODIFIED: filter by userId
             function renderRewards() {
-                const totalPoints = materials.reduce((acc, m) => acc + (m.points || 0), 0);
+                const userMaterials = currentUserId ? materials.filter(m => m.userId === currentUserId) : [];
+                const totalPoints = userMaterials.reduce((acc, m) => acc + (m.points || 0), 0);
                 document.getElementById('rewardPoints').innerText = totalPoints;
                 const percent = Math.min(100, (totalPoints / 1000) * 100);
                 document.getElementById('milestoneBar').style.width = percent + '%';
                 document.getElementById('milestoneText').innerText = totalPoints + '/1000';
             }
 
-            // overview (now uses translation for impact message)
+            // overview – MODIFIED: filter by userId
             function renderOverview() {
-                const totalMaterials = materials.length;
-                const totalPoints = materials.reduce((acc, m) => acc + (m.points || 0), 0);
-                const totalGrams = materials.reduce((acc, m) => acc + (m.weight || 0), 0);
+                const userMaterials = currentUserId ? materials.filter(m => m.userId === currentUserId) : [];
+                const totalMaterials = userMaterials.length;
+                const totalPoints = userMaterials.reduce((acc, m) => acc + (m.points || 0), 0);
+                const totalGrams = userMaterials.reduce((acc, m) => acc + (m.weight || 0), 0);
                 document.getElementById('overviewTotalMaterials').innerText = totalMaterials;
                 document.getElementById('overviewTotalPoints').innerText = totalPoints;
 
-                // Impact message with translation
                 const lang = getCurrentLang();
                 const impactTemplate = translations[lang]?.impact_message || translations.en.impact_message;
                 document.getElementById('impactText').innerHTML = impactTemplate.replace('{grams}', totalGrams);
 
-                // recent uploads (last 3) – MODIFIED: added delete icon
-                const recent = [...materials].reverse().slice(0, 3);
+                // recent uploads (last 3)
+                const recent = [...userMaterials].reverse().slice(0, 3);
                 const container = document.getElementById('recentUploads');
                 container.innerHTML = '';
                 recent.forEach(m => {
@@ -726,17 +728,18 @@
                 });
             }
 
-            // my materials – MODIFIED: added delete icon
+            // my materials – MODIFIED: filter by userId
             function renderMyMaterials() {
                 const container = document.getElementById('materialsList');
                 container.innerHTML = '';
-                if (materials.length === 0) {
+                const userMaterials = currentUserId ? materials.filter(m => m.userId === currentUserId) : [];
+                if (userMaterials.length === 0) {
                     const lang = getCurrentLang();
                     const msg = translations[lang]?.no_materials || translations.en.no_materials;
                     container.innerHTML = `<p class="stat-card">${msg}</p>`;
                     return;
                 }
-                materials.slice().reverse().forEach(m => {
+                userMaterials.slice().reverse().forEach(m => {
                     const card = document.createElement('div');
                     card.className = 'material-card';
                     card.innerHTML = `
@@ -749,19 +752,20 @@
                 });
             }
 
-            // statistics (uncharted parts stay)
+            // statistics – MODIFIED: filter by userId
             function renderStatistics() {
-                const totalGrams = materials.reduce((acc, m) => acc + (m.weight || 0), 0);
-                const totalPoints = materials.reduce((acc, m) => acc + (m.points || 0), 0);
-                const uploads = materials.length;
+                const userMaterials = currentUserId ? materials.filter(m => m.userId === currentUserId) : [];
+                const totalGrams = userMaterials.reduce((acc, m) => acc + (m.weight || 0), 0);
+                const totalPoints = userMaterials.reduce((acc, m) => acc + (m.points || 0), 0);
+                const uploads = userMaterials.length;
                 document.getElementById('statTotalGrams').innerText = totalGrams;
                 document.getElementById('statTotalPoints').innerText = totalPoints;
                 document.getElementById('statUploads').innerText = uploads;
 
                 const now = Date.now();
                 const oneDay = 24 * 60 * 60 * 1000;
-                const last24 = materials.filter(m => (now - new Date(m.date).getTime()) <= oneDay).reduce((acc, m) => acc + m.weight, 0);
-                const prev24 = materials.filter(m => {
+                const last24 = userMaterials.filter(m => (now - new Date(m.date).getTime()) <= oneDay).reduce((acc, m) => acc + m.weight, 0);
+                const prev24 = userMaterials.filter(m => {
                     const diff = now - new Date(m.date).getTime();
                     return diff > oneDay && diff <= 2 * oneDay;
                 }).reduce((acc, m) => acc + m.weight, 0);
@@ -775,8 +779,8 @@
                 const ctx = document.getElementById('statsChart').getContext('2d');
                 if (chartInstance) chartInstance.destroy();
 
-                const types = [...new Set(materials.map(m => m.name))];
-                const pointsByType = types.map(t => materials.filter(m => m.name === t).reduce((acc, m) => acc + m.points, 0));
+                const types = [...new Set(userMaterials.map(m => m.name))];
+                const pointsByType = types.map(t => userMaterials.filter(m => m.name === t).reduce((acc, m) => acc + m.points, 0));
 
                 chartInstance = new Chart(ctx, {
                     type: 'doughnut',
@@ -818,7 +822,9 @@
                     weight,
                     points: weight,
                     date: new Date().toISOString(),
-                    imageBase64: imageBase64 || null
+                    imageBase64: imageBase64 || null,
+                    // ----- Added for userId integration -----
+                    userId: currentUserId || null
                 };
                 materials.push(newMaterial);
                 saveMaterials();
@@ -871,7 +877,7 @@
             const savedTheme = localStorage.getItem('bekyaTheme') || 'light';
             setTheme(savedTheme);
 
-            // ----- LANGUAGE TOGGLE (now with full translation) -----
+            // ----- LANGUAGE TOGGLE -----
             const langToggle = document.getElementById('langToggle');
 
             function setLanguage(lang) {
@@ -882,11 +888,8 @@
                     document.body.dir = 'ltr';
                     localStorage.setItem('bekyaLang', 'en');
                 }
-                // Apply translations to all static elements
                 applyTranslations(lang);
-                // Re-render dynamic sections that contain translatable text
                 renderAllSections();
-                // Update chart colors if visible (theme change may affect)
                 if (chartInstance) renderStatistics();
             }
 
@@ -896,42 +899,32 @@
                 setLanguage(newLang);
             });
 
-            // load saved language and apply translations
             const savedLang = localStorage.getItem('bekyaLang') || 'en';
             setLanguage(savedLang);
 
-            // ----- DELETE FUNCTIONALITY (cards in Overview & My Materials) -----
+            // ----- DELETE FUNCTIONALITY (unchanged) -----
             function deleteMaterial(id) {
-                // Remove from materials array
                 const index = materials.findIndex(m => m.id.toString() === id);
                 if (index === -1) return;
                 materials.splice(index, 1);
-
-                // Save to localStorage (triggers re-render via saveMaterials)
                 saveMaterials();
-
-                // Attempt to delete from IndexedDB (if the database exists)
                 deleteFromIndexedDB(id);
             }
 
             function deleteFromIndexedDB(id) {
-                // Minimal IndexedDB deletion – does nothing if the DB isn't used.
-                // This satisfies the requirement without breaking existing code.
                 const request = indexedDB.open('bekyaDB', 1);
                 request.onsuccess = function(event) {
                     const db = event.target.result;
                     if (db.objectStoreNames.contains('materials')) {
                         const tx = db.transaction('materials', 'readwrite');
                         const store = tx.objectStore('materials');
-                        store.delete(Number(id)); // assume id is numeric
+                        store.delete(Number(id));
                     }
                     db.close();
                 };
-                // Ignore errors silently (DB may not exist)
                 request.onerror = function() {};
             }
 
-            // Event delegation for delete icons
             document.getElementById('materialsList').addEventListener('click', function(e) {
                 const deleteIcon = e.target.closest('.delete-icon');
                 if (deleteIcon) {
@@ -955,6 +948,4 @@
     </script>
 </body>
 </html>
-
-
 
